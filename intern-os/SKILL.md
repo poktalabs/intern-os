@@ -1,7 +1,7 @@
 ---
 name: intern-os
 description: internOS Workstreams framework. Coordinates work across projects, tick.md tasks, communication threads, and filesystem workstreams. Load this skill when operating in a workstream thread or when setting up internOS.
-version: 1.1.0
+version: 1.1.1
 repo: https://github.com/poktalabs/intern-os
 prerequisites:
   commands: [tick]

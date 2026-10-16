@@ -154,6 +154,23 @@ Invoke with `/checkpoint`. Both `checkpoint` and `session-wrap` log to the share
 Claude-Code-specific dependency beyond that log file — no gbrain, no gstack — so this one has no
 reason to skip.
 
+### 8. Install the `latest` companion skill (optional)
+
+**`latest`** is the read side of `checkpoint` and `session-wrap`: `/latest` loads the latest status
+of the current workstream (STATUS.md, its pick-up checkpoint, recent sessions, commits and tick
+tasks) and summarizes it. Outside a workstream but inside a project, it ranks the project's
+workstreams by STATUS `updated:` date and loads the newest project checkpoint. Read-only; it uses
+the installed `resolve-thread.sh`, so install the core adapter first:
+
+```bash
+REPO=$(pwd)   # or wherever you've cloned intern-os
+cp -R "$REPO/adapters/claude-code/skills/latest" ~/.claude/skills/latest
+chmod +x ~/.claude/skills/latest/scripts/latest.sh
+```
+
+Needs `jq` to read the checkpoint log; without it, it falls back to the STATUS.md pointer and
+`docs/checkpoints/`.
+
 ---
 
 ## Isolated-session handoff

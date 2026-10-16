@@ -2,6 +2,21 @@
 
 > **Version scheme:** internOS moved to `0.x.x` versioning starting with this release to reflect alpha status. Prior releases are kept as historical record.
 
+## v1.1.1 (2026-10-15)
+
+Adds the **`latest`** companion skill, the read side of `checkpoint` and `session-wrap`, and releases the companion-skill work merged since v1.1.0.
+
+### New features
+
+- **`/latest`: load the latest status.** New `adapters/claude-code/skills/latest/` (v0.1.0). Inside a workstream it loads STATUS.md, the pick-up checkpoint (newest `~/.claude/checkpoint-log.jsonl` entry scoped to the workstream, plus the STATUS.md pointer), the last 5 sessions, recent commits and open tick tasks, then summarizes state and next step. Inside a project but outside a workstream it ranks non-archived workstreams by STATUS `updated:` date and loads the newest project checkpoint. Read-only. Unlike the global `latest-checkpoint-pointer.sh` hook, which shows the newest checkpoint across every project, `/latest` is scoped to the cwd. Resolution reuses `resolve-thread.sh`, so it also binds from a declared `code/.worktrees/<name>/`.
+- **`checkpoint` companion skill (v0.1.0)**: fast progress save before `/compact` or `/clear` (merged after v1.1.0, first released here).
+- **`session-wrap` 0.2.0 → 0.4.0**: Step 6 log + verify workflow, optional per-execution cost tracker (merged after v1.1.0, first released here).
+
+### Docs
+
+- `adapters/claude-code/SETUP.md`: section 8 installs `latest`.
+- `intern-os/VERSION` 1.1.0 → 1.1.1; `intern-os/SKILL.md` `version:` 1.1.0 → 1.1.1; README release line.
+
 ## v1.1.0 — 2026-08-16
 
 **⚠️ Supersedes an old `v1.1.0` tag.** Like the `v1.0.0` reset below, this repo carried stale pre-alpha-reset tags — `v1.0.1` (2026-03-27) and `v1.1.0` (2026-03-30) — from the abandoned pre-`0.x` lineage. Neither was ever published as a GitHub Release or battle-tested. The old `v1.1.0` tag has been deleted and re-pointed here; the stale `v1.0.1` tag has been removed entirely (no `v1.0.1` release exists — the line goes `v1.0.0` → `v1.1.0`). If you have anything referencing the old `v1.0.1` or `v1.1.0` from before 2026-08-16, re-fetch — they pointed at different, untested code.

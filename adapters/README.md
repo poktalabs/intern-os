@@ -37,6 +37,7 @@ Regardless of framework, the adapter must configure the agent to:
 | [OpenClaw](openclaw/) | `adapters/openclaw/` | SKILL.md + AGENTS.md block |
 | [Hermes Agent](hermes/) | `adapters/hermes/` | SKILL.md (Hermes skill format) |
 | [Claude Code](claude-code/) | `adapters/claude-code/` | CLAUDE.md (project instructions) |
+| [Devin](devin/) | `adapters/devin/` | AGENTS.md block + blueprint |
 | [Generic](generic/) | `adapters/generic/` | Manual setup for any agent |
 
 ---

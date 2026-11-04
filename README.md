@@ -28,7 +28,8 @@ Agents loaded with this framework know how to:
 | **Hermes Agent** | `hermes skills install poktalabs/intern-os/intern-os` |
 | **OpenClaw** | `openclaw skills install https://github.com/poktalabs/intern-os` |
 | **Claude Code** | Copy `adapters/claude-code/CLAUDE.md` to your project root |
-| **Other** (Devin, Codex, Cursor) | See `adapters/generic/SETUP.md`, which also lists what a new adapter must cover |
+| **Devin** | Append `adapters/devin/AGENTS.md` to the project repo's `AGENTS.md`, then follow `adapters/devin/SETUP.md` |
+| **Other** (Codex, Cursor) | See `adapters/generic/SETUP.md`, which also lists what a new adapter must cover |
 
 After installing, follow your framework's setup guide in `adapters/[framework]/SETUP.md`.
 

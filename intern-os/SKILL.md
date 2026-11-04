@@ -29,6 +29,7 @@ internOS is a framework for humans and agents to collaborate on workstreams with
 | **Hermes Agent** | `hermes skills install poktalabs/intern-os/intern-os` |
 | **OpenClaw** | `openclaw skills install https://github.com/poktalabs/intern-os` |
 | **Claude Code** | Copy `adapters/claude-code/CLAUDE.md` to your project root |
+| **Devin** | Append `adapters/devin/AGENTS.md` to the project repo's `AGENTS.md`; see `adapters/devin/SETUP.md` |
 | **Other** | See `adapters/generic/SETUP.md` |
 
 After installing, follow your adapter's SETUP.md for framework-specific configuration.

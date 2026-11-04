@@ -114,6 +114,9 @@ if [[ "$primary" != "$expected" && "$sibling" != "$expected" ]]; then
     echo "  expected (in thread_id or thread_id_devin): $expected" >&2
     echo "  thread_id:       ${primary:-<empty>}" >&2
     echo "  thread_id_devin: ${sibling:-<empty>}" >&2
+    if [[ "$primary" == devin:* && "$primary" != devin:projects/* ]]; then
+        echo "  thread_id is a Devin session ID; those never recur. The human should replace it with $expected." >&2
+    fi
     echo "  Stop and ask the human. Do not edit BRIEF.md to make it match." >&2
     exit 2
 fi

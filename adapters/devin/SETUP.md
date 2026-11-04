@@ -62,7 +62,7 @@ thread_id: slack:C07ABC123/1234567890.123456
 thread_id_devin: devin:projects/<project>/workstreams/<name>
 ```
 
-Never remove another harness's ID to add Devin's. Older Devin bindings of the form `thread_id: devin:<session-id>` resolve nothing, because that session will never exist again. Replace them with the path form.
+Never remove another harness's ID to add Devin's. Older Devin bindings of the form `thread_id: devin:<session-id>` resolve nothing, because that session will never exist again. Replace them with the path form; the resolver flags them.
 
 **Naming the workstream.** The human names the path in the session prompt, for example:
 
@@ -103,12 +103,14 @@ Everything else is Tier 2 or 3, read on demand: `DECISIONS.md` and `STAKEHOLDERS
 
 Devin has no session-end hook, and a session can sleep instead of ending. Session close is therefore doctrine that the `AGENTS.md` block spells out. It runs before the session's final report to the human:
 
-1. `tick done TASK-X @devin` or `tick release TASK-X @devin`.
+1. If a task was claimed: `tick done TASK-X @devin` or `tick release TASK-X @devin`.
 2. Replace `STATUS.md` current-state fields in place (≤10 lines, no dated sections).
 3. Append to `DECISIONS.md`. Consolidate `MEMORY.md` if it is over 80 lines.
 4. Append to `SESSIONS.md`: `<YYYY-MM-DD HH:MM> · devin:<session-id> · <summary>`. The session ID goes in the log only, not in the binding.
 5. `bash "$INTERNOS_HOME/intern-os/scripts/sync-check.sh" --workstream <dir>` and fix what it reports.
 6. Commit the workstream files and push them.
+
+**Commit identity.** Devin commits as its own GitHub identity and does not override `user.name`/`user.email`. If a project requires one specific author on every commit, a human commits Devin's workstream changes instead, or the project relaxes that rule for workstream files.
 
 **Getting it to the shared repo.** By default Devin pushes `chore/<workstream>-status` and opens a PR on the project repo, and the human merges it. That PR is the hand-off: the next agent, on any harness, sees the update after the merge and a `git pull`. A project that wants status to land without review can say so in its `AGENTS.md` (for example "workstream files may be pushed straight to `main`").
 
@@ -164,7 +166,7 @@ knowledge:
 
 Notes:
 
-- **Why a symlink.** Bindings are relative to the workspace (`projects/<project>/...`). Devin clones repos into `~/repos/`, so `~/internos/projects/<project>` links to the clone, and the same path string resolves on every harness. Use the project's directory name from the other harnesses, which can differ from the repo name.
+- **Why a symlink.** Bindings are relative to the workspace (`projects/<project>/...`). Devin clones repos into `~/repos/`, so `~/internos/projects/<project>` links to the clone, and the same path string resolves on every harness. Use the project's directory name from the other harnesses, which can differ from the repo name: a project repo `<org>/acme-project-dir` bound elsewhere as `projects/acme/...` is linked as `~/internos/projects/acme`.
 - **Several projects.** Add each project repo to the environment and add one `ln -sfn` per project. A single `~/internos` workspace serves them all.
 - **Code repos** (`code/<repo>/` elsewhere) are separate repos in the same environment, cloned to `~/repos/<repo>`. They need no symlink: Devin works in them directly.
 - **Pinning.** For reproducible sessions, pin the framework to a release with `git clone --branch v1.1.2 ...` and drop the `maintenance` pull.

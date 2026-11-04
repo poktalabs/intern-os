@@ -38,7 +38,7 @@ from the transcript.
 
 ### Before ending the session (required, even if nothing changed)
 
-1. `tick done TASK-X @devin` or `tick release TASK-X @devin`.
+1. If you claimed a task: `tick done TASK-X @devin` or `tick release TASK-X @devin`.
 2. Replace the current-state fields of `STATUS.md` in place (≤10 lines).
    Never append a dated section.
 3. Append new decisions to `DECISIONS.md`. Consolidate `MEMORY.md` if it is

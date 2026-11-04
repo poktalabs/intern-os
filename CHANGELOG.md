@@ -2,6 +2,25 @@
 
 > **Version scheme:** internOS moved to `0.x.x` versioning starting with this release to reflect alpha status. Prior releases are kept as historical record.
 
+## v1.1.2 (2026-11-04)
+
+Makes internOS ready for agents without a dedicated adapter, and for working one workstream from several harnesses in parallel.
+
+### New features
+
+- **Multi-harness workstreams.** `FRAMEWORK.md` (EN/ES) and `adapters/generic/SETUP.md` document sibling thread IDs per harness, exact-path binding for harnesses that get a new ID every session, and git as the shared state between them.
+- **Writing an adapter.** `adapters/generic/SETUP.md` lists what any new harness adapter must cover.
+- **Branch doctrine for code repos.** New "Code repository doctrine" section in `FRAMEWORK.md` (EN/ES): `main` is production, `staging` the integration branch when a staging environment exists, work branches `feat/`, `fix/`, `chore/`, `docs/`, `refactor/`, `test/`, `perf/`. `worktree.sh create` now refuses a branch without one of those prefixes.
+
+### Fixes
+
+- `resolve-thread.sh` resolves archived workstreams (`workstreams/archived/<name>`).
+- `adapters/generic/SETUP.md`: corrected the `WORKSTREAMS.md` path and refreshed the version stamp, which still said v0.3.0.
+
+### Docs
+
+- `intern-os/VERSION` 1.1.1 → 1.1.2; `intern-os/SKILL.md` `version:` 1.1.1 → 1.1.2; README release line and install table.
+
 ## v1.1.1 (2026-10-15)
 
 Adds the **`latest`** companion skill, the read side of `checkpoint` and `session-wrap`, and releases the companion-skill work merged since v1.1.0.

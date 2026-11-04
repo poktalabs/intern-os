@@ -287,6 +287,8 @@ thread_id: slack:C07ABC123/1234567890.123456
 
 The agent writes this field when creating the workstream directory, using the thread ID from platform metadata. `thread_id` is mandatory in every BRIEF.md.
 
+**Multiple harnesses:** a workstream can be worked from several agents. `thread_id` stays the primary binding, and each other harness adds a sibling field (`thread_id_claude_code`, for example). A harness that gets a new ID every session binds by exact workstream path (`projects/<project>/workstreams/<name>`) instead. Both are exact matches. Shared state reaches every harness through the project's git repo: see `adapters/generic/SETUP.md`.
+
 **Agent instructions:** Each agent framework has its own mechanism for loading instructions. See `adapters/` for framework-specific configuration:
 
 - **OpenClaw:** SKILL.md + AGENTS.md block → `adapters/openclaw/`
@@ -323,6 +325,16 @@ By default:
 - Do not infer from similar names
 
 Cross-workstream synthesis must be explicit and requested by the human.
+
+---
+
+## Code repository doctrine
+
+For code repos under `code/<repo>/`:
+- **Integration branches:** `main` is production. When the project has a staging environment, `staging` is the integration branch: work merges into `staging`, is verified there, then `staging` merges into `main`. No other long-lived branches (no per-scope or per-wave integration branches).
+- **Work branches** start from the integration branch and carry a conventional prefix matching the commit type: `feat/<kebab-name>` for features, `fix/` for bug fixes, `chore/`, `docs/`, `refactor/`, `test/`, `perf/` otherwise. Never `ticket/*`, personal names, or bare names.
+- Nobody commits directly to `main` or `staging`; merges into them are `--no-ff` from a work branch.
+- `intern-os/scripts/worktree.sh create` refuses a branch without one of these prefixes. Agents creating branches by hand (`git switch -c`, `git worktree add -b`) follow the same rule.
 
 ---
 

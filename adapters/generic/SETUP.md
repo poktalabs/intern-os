@@ -2,7 +2,7 @@
 
 *internOS v1.1.2 | 2026-11-04*
 
-Manual setup for agent frameworks without a dedicated adapter, including cloud agents such as Devin, Codex and Cursor. To write a dedicated adapter, see [Writing an adapter](#writing-an-adapter).
+Manual setup for agent frameworks without a dedicated adapter, including cloud agents such as Codex and Cursor. Devin has its own adapter in [`adapters/devin/`](../devin/SETUP.md). To write a dedicated adapter, see [Writing an adapter](#writing-an-adapter).
 
 ---
 

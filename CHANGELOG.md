@@ -2,6 +2,16 @@
 
 > **Version scheme:** internOS moved to `0.x.x` versioning starting with this release to reflect alpha status. Prior releases are kept as historical record.
 
+## Unreleased
+
+### New features
+
+- **Devin adapter.** New `adapters/devin/`: `SETUP.md` covering the six points of "Writing an adapter", an `AGENTS.md` instruction block for the project repo, and `scripts/resolve-workstream.sh`. Devin session IDs change every session, so the adapter binds workstreams by exact path (`thread_id_devin: devin:projects/<project>/workstreams/<name>`). The resolver exits non-zero on any mismatch instead of guessing, and `--load` prints the Tier 1 bundle (project `AGENTS.md`, `BRIEF.md`, `STATUS.md`). Machine setup (Node, `tick-md`, the framework clone, the workspace symlink, `INTERNOS_WORKSPACE`) goes in the project repo's Devin blueprint.
+
+### Docs
+
+- README, `adapters/README.md`, `intern-os/SKILL.md` install tables and `adapters/generic/SETUP.md` point Devin at the new adapter.
+
 ## v1.1.2 (2026-11-04)
 
 Makes internOS ready for agents without a dedicated adapter, and for working one workstream from several harnesses in parallel.

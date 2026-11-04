@@ -287,6 +287,8 @@ thread_id: slack:C07ABC123/1234567890.123456
 
 El agente escribe este campo al crear el directorio del workstream, usando el ID del thread de los metadatos de la plataforma. `thread_id` es obligatorio en cada BRIEF.md.
 
+**Varios harnesses:** un workstream puede trabajarse desde varios agentes. `thread_id` sigue siendo la vinculación principal, y cada harness adicional agrega un campo hermano (por ejemplo `thread_id_claude_code`). Un harness que recibe un ID nuevo en cada sesión se vincula por la ruta exacta del workstream (`projects/<project>/workstreams/<name>`). Ambas son coincidencias exactas. El estado compartido llega a cada harness por el repo git del proyecto: ver `adapters/generic/SETUP.md`.
+
 **Instrucciones del agente:** Cada framework de agente tiene su propio mecanismo para cargar instrucciones. Ver `adapters/` para la configuración específica de cada framework:
 
 - **OpenClaw:** SKILL.md + bloque AGENTS.md → `adapters/openclaw/`
@@ -326,6 +328,16 @@ Por defecto:
 - No inferir a partir de nombres similares
 
 La síntesis entre workstreams debe ser explícita y solicitada por el humano.
+
+---
+
+## Doctrina de repositorios de código
+
+Para repos de código en `code/<repo>/`:
+- **Ramas de integración:** `main` es producción. Si el proyecto tiene un entorno de staging, `staging` es la rama de integración: el trabajo se fusiona en `staging`, se verifica ahí y después `staging` se fusiona en `main`. No hay otras ramas de larga vida (ni ramas de integración por alcance o por ola).
+- **Ramas de trabajo** salen de la rama de integración y llevan un prefijo convencional según el tipo de commit: `feat/<nombre-kebab>` para funcionalidades, `fix/` para correcciones, y `chore/`, `docs/`, `refactor/`, `test/`, `perf/` en los demás casos. Nunca `ticket/*`, nombres personales ni nombres sin prefijo.
+- Nadie hace commit directo en `main` ni en `staging`; se fusionan con `--no-ff` desde una rama de trabajo.
+- `intern-os/scripts/worktree.sh create` rechaza una rama sin uno de estos prefijos. Los agentes que crean ramas a mano (`git switch -c`, `git worktree add -b`) siguen la misma regla.
 
 ---
 

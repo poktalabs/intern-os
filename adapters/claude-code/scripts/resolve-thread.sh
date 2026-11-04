@@ -123,6 +123,7 @@ fi
 #
 # A workstream dir is exactly:
 #   <WORKSPACE>/projects/<path-to-project>/workstreams/<name>
+#   (or, once archived: .../workstreams/archived/<name>)
 #
 # <path-to-project> may be a simple top-level project (`foo`) or a nested child
 # project under a container (`club/club-app`, `devrel/nebius`). The canonical
@@ -135,7 +136,9 @@ workstream_dir=""
 while [[ "$current" == "$WORKSPACE"/* ]]; do
     # Match: <WORKSPACE>/projects/<path-to-project>/workstreams/<name>
     rel="${current#$WORKSPACE/}"
-    if [[ "$rel" =~ ^projects/.+/workstreams/[^/]+$ ]]; then
+    # Archived workstreams live one level deeper (workstreams/archived/<name>,
+    # per ROLLOUT.md); the `archived` container itself is not a workstream.
+    if [[ "$rel" =~ ^projects/.+/workstreams/(archived/)?[^/]+$ && "$rel" != */workstreams/archived ]]; then
         workstream_dir="$current"
         break
     fi

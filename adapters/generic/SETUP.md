@@ -1,8 +1,8 @@
 # SETUP — Generic Adapter (Any Agent Framework)
 
-*internOS v0.3.0 | 2026-04-11*
+*internOS v1.1.2 | 2026-11-04*
 
-Manual setup for agent frameworks without a dedicated adapter.
+Manual setup for agent frameworks without a dedicated adapter, including cloud agents such as Devin, Codex and Cursor. To write a dedicated adapter, see [Writing an adapter](#writing-an-adapter).
 
 ---
 
@@ -18,7 +18,7 @@ Manual setup for agent frameworks without a dedicated adapter.
 ### 1. Install tick.md
 
 ```bash
-npm install -g tick-md
+pnpm add -g tick-md
 ```
 
 ### 2. Add internOS instructions to your agent
@@ -33,8 +33,9 @@ of any session in a communication thread that has a workstream context.
 
 ### Resolution
 
-Resolve the workstream by exact `thread_id` in BRIEF.md.
-If no exact match exists, stop and ask — never guess.
+Resolve the workstream by exact `thread_id` in BRIEF.md. If this agent has no
+stable thread (each session gets a new ID), resolve by the exact workstream
+path the human named instead. If no exact match exists, stop and ask. Never guess.
 
 ### Loading order
 
@@ -78,7 +79,7 @@ the workstream is invisible to the next agent or session.
 ### 3. Copy WORKSTREAMS.md to your workspace
 
 ```bash
-cp [intern-os-repo]/assets/WORKSTREAMS.md [workspace]/WORKSTREAMS.md
+cp [intern-os-repo]/intern-os/assets/WORKSTREAMS.md [workspace]/WORKSTREAMS.md
 ```
 
 ### 4. Create the projects directory
@@ -111,6 +112,31 @@ Apply instruction changes by restarting the agent session.
 - [ ] At least one project initialized with tick.md
 - [ ] Agent registered: `cd projects/[project] && tick agent list`
 - [ ] Agent restarted
+
+---
+
+## Working across harnesses
+
+One workstream can be worked from several agents at once, for example a local CLI agent and a cloud agent.
+
+- **Shared state lives in git.** Keep each project in its own repo. Pull before starting and push `STATUS.md`, `DECISIONS.md` and task changes when finishing, so the next agent sees them.
+- **One ID per harness.** `thread_id` stays as the primary binding. Other harnesses add a sibling field such as `thread_id_claude_code`. Never remove one harness's ID to add another.
+- **Session-scoped harnesses.** If an agent gets a new ID every session, its ID cannot bind a workstream. Bind by exact path (`projects/<project>/workstreams/<name>`) instead. This is still an exact match, not a guess.
+
+---
+
+## Writing an adapter
+
+An adapter is the smallest set of files that lets a harness follow the framework. Put it in `adapters/<harness>/` with its own `SETUP.md`. It must cover:
+
+1. **Instructions:** how the harness loads the block in step 2 at session start (instruction file, repo knowledge, system prompt).
+2. **Resolution:** how the session finds its workstream, by exact `thread_id` or exact path, and stops to ask when nothing matches.
+3. **Loading order:** project `AGENTS.md`, then `BRIEF.md`, then `STATUS.md`, escalating to other files only on demand.
+4. **Session close:** how `STATUS.md` and tasks get updated, and how they reach the shared repo.
+5. **Environment:** what must exist on the machine (git access to the project repo, `tick`, workspace path). Cloud agents usually start from a fresh machine, so the setup has to be repeatable.
+6. **Secrets:** where credentials live. They never go in tracked workstream files.
+
+Read `intern-os/SKILL.md` and `intern-os/references/en/FRAMEWORK.md` first, and use `adapters/claude-code/` or `adapters/hermes/` as worked examples.
 
 ---
 

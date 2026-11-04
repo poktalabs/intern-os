@@ -200,6 +200,11 @@ cmd_create() {
     [[ -e "$code_repo/.git" ]] || die "not a git repo: code/$repo"
 
     branch="${branch:-feat/$name}"
+    # Branch doctrine (FRAMEWORK.md "Code repository doctrine"): work branches
+    # carry a conventional prefix; integration branches (main, staging) are
+    # never created as worktree branches.
+    [[ "$branch" =~ ^(feat|fix|chore|docs|refactor|test|perf)/[a-z0-9][a-z0-9._-]*$ ]] \
+        || die "branch '$branch' must be feat/|fix/|chore/|docs/|refactor/|test/|perf/<kebab-name>"
     wt_path="$project_root/$WORKTREES_SUBDIR/$name"
     [[ -e "$wt_path" ]] && die "worktree path already exists: $WORKTREES_SUBDIR/$name"
 

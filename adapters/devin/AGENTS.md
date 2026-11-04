@@ -31,7 +31,8 @@ from the transcript.
 ### While working
 
 - `git pull` the project repo before starting.
-- Claim the task: `tick claim TASK-X @devin`.
+- Claim the task: `tick claim TASK-X @devin`. If another harness may work in
+  parallel, push the claim right away: `push-workstream.sh <dir> "claim TASK-X"`.
 - Code work happens in the code repo's own clone on a `feat/` / `fix/` /
   `chore/` / `docs/` / `refactor/` / `test/` / `perf/` branch. Never commit to
   `main` or `staging`.
@@ -46,8 +47,11 @@ from the transcript.
 4. Append one line to `SESSIONS.md`:
    `<YYYY-MM-DD HH:MM> · devin:<session-id> · <one-line summary>`.
 5. `bash "$INTERNOS_HOME/intern-os/scripts/sync-check.sh" --workstream <dir>`.
-6. Commit the workstream files and push them as this project's rules allow
-   (default: a `chore/<workstream>-status` branch and a PR).
+6. `push-workstream.sh <dir> "<summary>"`: commits only the workstream files
+   and `TICK.md`, rebases, and pushes to `main`. On exit 4 (a conflict it
+   will not guess, e.g. in STATUS.md) it has pushed a branch and opened a PR:
+   tell the human. Never force-push. If this project's rules require review
+   for status changes, open a PR instead.
 
 Credentials come from Devin Secrets. Never write a secret value into a
 workstream file; `RESOURCES.md` may name a secret, never hold it.

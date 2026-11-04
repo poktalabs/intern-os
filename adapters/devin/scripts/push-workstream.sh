@@ -17,8 +17,13 @@
 #     is opened if `gh` is available, and the script exits 4.
 #   - Before pushing, checks that the outgoing commits touch only allowed paths.
 #
+# Commit identity: Devin applies the user's "Git commit author" setting through
+# a git wrapper in its own shell, which this script does not inherit. The script
+# loads the same settings file, so its commits (and rebases) get that identity.
+#
 # Env: INTERNOS_PUSH_BRANCH (default main), INTERNOS_PUSH_REMOTE (default
-# origin), INTERNOS_PUSH_RETRIES (default 3, for push races).
+# origin), INTERNOS_PUSH_RETRIES (default 3, for push races),
+# INTERNOS_DEVIN_GIT_AUTHOR (default /opt/.devin/git_author).
 #
 # Exit codes:
 #   0  pushed, or nothing to push
@@ -45,7 +50,21 @@ ws_abs="$(cd "$ws_arg" && pwd -P)"
 root="$(git -C "$ws_abs" rev-parse --show-toplevel)"
 ws_rel="${ws_abs#"$root"/}"
 ws_name="$(basename "$ws_abs")"
+summary="${summary#"$ws_name: "}"
 cd "$root"
+
+commit_args=()
+devin_git_author="${INTERNOS_DEVIN_GIT_AUTHOR:-/opt/.devin/git_author}"
+if [[ -f "$devin_git_author" ]]; then
+    # shellcheck source=/dev/null
+    source "$devin_git_author"
+    if [[ -n "${DEVIN_COMMIT_AUTHOR:-}" ]]; then
+        commit_args+=(--author="$DEVIN_COMMIT_AUTHOR")
+    fi
+    if [[ -n "${DEVIN_COMMIT_TRAILER:-}" ]]; then
+        commit_args+=(--trailer="$DEVIN_COMMIT_TRAILER")
+    fi
+fi
 
 current="$(git rev-parse --abbrev-ref HEAD)"
 if [[ "$current" != "$BRANCH" ]]; then
@@ -76,7 +95,7 @@ if git diff --cached --quiet; then
         exit 0
     fi
 else
-    git commit -q -m "$ws_name: $summary"
+    git commit -q ${commit_args[@]+"${commit_args[@]}"} -m "$ws_name: $summary"
 fi
 
 fallback() {

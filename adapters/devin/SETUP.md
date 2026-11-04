@@ -111,7 +111,7 @@ Devin has no session-end hook, and a session can sleep instead of ending. Sessio
 5. `bash "$INTERNOS_HOME/intern-os/scripts/sync-check.sh" --workstream <dir>` and fix what it reports.
 6. Push: `push-workstream.sh <dir> "<summary>"` (or a PR, if the project requires review; see below).
 
-**Commit identity.** Devin commits as its own GitHub identity and does not override `user.name`/`user.email`. If a project requires one specific author on every commit, a human commits Devin's workstream changes instead, or the project relaxes that rule for workstream files.
+**Commit identity.** Devin applies the user's "Git commit author" setting (Settings > Preferences) through a git wrapper in its own shell, so commits get the identity the user chose there. Scripts run from that shell call git directly and do not inherit the wrapper, so `push-workstream.sh` loads the same settings (`/opt/.devin/git_author`) before it commits. Neither one overrides `user.name`/`user.email`. Pass `push-workstream.sh` only the summary: it adds the `<workstream>: ` prefix itself.
 
 **Getting it to the shared repo.** Workstream state is only shared once it is on the project repo's `main`, so the default is to push it there directly with `push-workstream.sh`. Its guardrails:
 

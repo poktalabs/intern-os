@@ -9,6 +9,10 @@
 - **Devin adapter.** New `adapters/devin/`: `SETUP.md` covering the six points of "Writing an adapter", an `AGENTS.md` instruction block for the project repo, and `scripts/resolve-workstream.sh`. Devin session IDs change every session, so the adapter binds workstreams by exact path (`thread_id_devin: devin:projects/<project>/workstreams/<name>`). The resolver exits non-zero on any mismatch instead of guessing, and `--load` prints the Tier 1 bundle (project `AGENTS.md`, `BRIEF.md`, `STATUS.md`). Machine setup (Node, `tick-md`, the framework clone, the workspace symlink, `INTERNOS_WORKSPACE`) goes in the project repo's Devin blueprint.
 - **Devin session close pushes straight to `main`.** New `adapters/devin/scripts/push-workstream.sh`: stages only the workstream directory and `TICK.md` (refuses if anything else is staged), rebases onto the remote branch, keeps both sides of conflicts in the append-only logs (`DECISIONS.md`, `SESSIONS.md`, `JOURNAL.md`), and never force-pushes. Any other conflict, outgoing commits outside the workstream, or repeated push rejection falls back to a `chore/<workstream>-status-*` branch and a PR (exit 4). `adapters/devin/SETUP.md` and `AGENTS.md` make it the default; projects that want review keep the PR path.
 
+### Fixes
+
+- `push-workstream.sh` commits with the identity from the user's Devin "Git commit author" setting. Devin applies that setting through a git wrapper in its own shell, and the script did not inherit it, so its commits were authored by the Devin bot. It also no longer doubles the `<workstream>: ` prefix when the summary already starts with it.
+
 ### Docs
 
 - README, `adapters/README.md`, `intern-os/SKILL.md` install tables and `adapters/generic/SETUP.md` point Devin at the new adapter.

@@ -20,6 +20,7 @@ Three consequences shape the adapter:
 |------|------|
 | `adapters/devin/AGENTS.md` | Instruction block for the project repo's `AGENTS.md` |
 | `adapters/devin/scripts/resolve-workstream.sh` | Exact-path resolver. With `--load` it prints the Tier 1 bundle. |
+| `adapters/devin/scripts/push-workstream.sh` | Session-close push straight to `main`, with conflict guardrails |
 | `intern-os/scripts/sync-check.sh` | Health check at session close (shared with the other adapters) |
 
 ---
@@ -108,13 +109,24 @@ Devin has no session-end hook, and a session can sleep instead of ending. Sessio
 3. Append to `DECISIONS.md`. Consolidate `MEMORY.md` if it is over 80 lines.
 4. Append to `SESSIONS.md`: `<YYYY-MM-DD HH:MM> · devin:<session-id> · <summary>`. The session ID goes in the log only, not in the binding.
 5. `bash "$INTERNOS_HOME/intern-os/scripts/sync-check.sh" --workstream <dir>` and fix what it reports.
-6. Commit the workstream files and push them.
+6. Push: `push-workstream.sh <dir> "<summary>"` (or a PR, if the project requires review; see below).
 
 **Commit identity.** Devin commits as its own GitHub identity and does not override `user.name`/`user.email`. If a project requires one specific author on every commit, a human commits Devin's workstream changes instead, or the project relaxes that rule for workstream files.
 
-**Getting it to the shared repo.** By default Devin pushes `chore/<workstream>-status` and opens a PR on the project repo, and the human merges it. That PR is the hand-off: the next agent, on any harness, sees the update after the merge and a `git pull`. A project that wants status to land without review can say so in its `AGENTS.md` (for example "workstream files may be pushed straight to `main`").
+**Getting it to the shared repo.** Workstream state is only shared once it is on the project repo's `main`, so the default is to push it there directly with `push-workstream.sh`. Its guardrails:
 
-**Task claims.** `tick claim` edits `TICK.md` on the VM only. If another harness might pick up the same task in parallel, commit and push the claim first, the same way as the session close, before starting the work.
+| Situation | What it does |
+|-----------|--------------|
+| Files outside the workstream (other than `TICK.md`) are staged | Refuses, exit 2. Unstaged edits elsewhere are left alone. |
+| Remote `main` moved | Rebases onto it before pushing. Never force-pushes. |
+| Conflict in `DECISIONS.md`, `SESSIONS.md` or `JOURNAL.md` | Append-only logs: keeps both sides, remote lines first |
+| Conflict anywhere else (`STATUS.md`, `BRIEF.md`, `TICK.md`, ...) | Does not guess. Pushes `chore/<workstream>-status-<time>-<sha>`, opens a PR, resets local `main`, exit 4. The agent tells the human. |
+| Outgoing commits touch other paths | Same fallback, exit 4 |
+| Push rejected 3 times (race) | Same fallback, exit 4 |
+
+A project that wants every status change reviewed says so in its `AGENTS.md`. Devin then pushes a `chore/<workstream>-status` branch and opens a PR instead, and the next agent sees the update after the merge.
+
+**Task claims.** `tick claim` edits `TICK.md` on the VM only. If another harness might pick up the same task in parallel, push the claim first with `push-workstream.sh <dir> "claim TASK-X"` before starting the work. A `TICK.md` conflict means someone else touched the board: re-pull and check the task is still free.
 
 **Code work.** Each Devin session has its own VM, so the session's clone of the code repo (`~/repos/<repo>`) is already an isolated checkout. `code/.worktrees/` is not needed on Devin. Branch names follow FRAMEWORK.md's code repository doctrine (`feat/`, `fix/`, ...). Record the branch in the BRIEF `worktrees:` block only when another harness will continue it in a worktree.
 
@@ -140,6 +152,7 @@ initialize:
       git clone --depth 1 https://github.com/poktalabs/intern-os "$INTERNOS_HOME"
       mkdir -p "$HOME/.local/bin"
       ln -sf "$INTERNOS_HOME/adapters/devin/scripts/resolve-workstream.sh" "$HOME/.local/bin/resolve-workstream.sh"
+      ln -sf "$INTERNOS_HOME/adapters/devin/scripts/push-workstream.sh" "$HOME/.local/bin/push-workstream.sh"
       echo "INTERNOS_HOME=$INTERNOS_HOME" >> $ENVRC
       echo 'export PATH="$HOME/.local/bin:$PATH"' >> $ENVRC
 
@@ -199,7 +212,7 @@ Devin can delegate to child sessions. A child starts on its own VM from the same
 Run these in a Devin session after the snapshot rebuild:
 
 ```bash
-which tick resolve-workstream.sh                 # both on PATH
+which tick resolve-workstream.sh push-workstream.sh   # all on PATH
 echo "$INTERNOS_WORKSPACE" && ls "$INTERNOS_WORKSPACE/projects"
 resolve-workstream.sh --load projects/<project>/workstreams/<name>; echo "exit: $?"   # 0
 resolve-workstream.sh projects/<project>/workstreams/does-not-exist; echo "exit: $?"   # 1
@@ -210,7 +223,7 @@ bash "$INTERNOS_HOME/intern-os/scripts/sync-check.sh" --workstream \
 - [ ] The project repo's `AGENTS.md` contains the internOS block
 - [ ] The workstream's `BRIEF.md` binds `devin:projects/<project>/workstreams/<name>`
 - [ ] The resolver exits 0 for that path and 1 for an unknown one
-- [ ] A session that ends updates `STATUS.md` and `SESSIONS.md` and opens a PR (or pushes, if the project allows it)
+- [ ] A session that ends updates `STATUS.md` and `SESSIONS.md` and `push-workstream.sh` lands them on `main`
 
 ---
 

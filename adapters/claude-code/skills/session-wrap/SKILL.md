@@ -2,7 +2,7 @@
 name: session-wrap
 repo: https://github.com/poktalabs/intern-os
 metadata:
-  version: 0.4.0
+  version: 0.5.0
 description: >-
   Curated end-of-session wrap for internOS work. Use this whenever the user is closing out a
   working session or about to reset context — "wrap up", "end session", "save context", "let's
@@ -125,6 +125,20 @@ Then add a one-line pointer to the checkpoint at the TOP of the workstream's STA
 session that auto-loads STATUS surfaces the checkpoint immediately.
 
 Keep it skimmable — headings + tight bullets, not prose. It is a map, not a memoir.
+
+## Step 5b: Stop every server this session started
+
+Before the closing message, stop what this session left running: dev servers (`bun --watch`,
+`vite`, `next dev`, `node`), local databases or containers it started (e.g. `supabase start`,
+`docker compose up`), browser daemons (gstack `$B` / browse server), tunnels, and background
+tasks still alive. Use the project's own stop command when one exists (e.g.
+`scripts/dev-bioagent.sh --stop`), otherwise kill by PID or port.
+
+Only what THIS session started: check `lsof -nP -iTCP -sTCP:LISTEN` and each process's cwd /
+start time, and leave anything older or from another session or project running (another
+Claude session, the user's own apps, long-lived shared containers like a gbrain database).
+Then confirm the ports are free and list what you stopped in the closing message. If unsure
+whether a process is this session's, ask instead of killing it.
 
 ## Step 6 — Log + continue or clear
 
